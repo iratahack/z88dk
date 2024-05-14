@@ -42,7 +42,13 @@ jobs:
         MAKE_CONCURRENCY=-j2 ./build.sh -pzx -pzxn
     - name: Generate tar-ball
       run: |
-        strip bin/*
+        for file in `find ./bin/`; do
+          file $file | grep -i elf >> /dev/null
+          if [ $? = 0 ]; then
+            echo "Stripping $file"
+            strip $file
+          fi
+        done
         cd ..
         tar cfz z88dk-ubuntu-22.04.tgz z88dk/bin z88dk/lib z88dk/include z88dk/libsrc/*.lib z88dk/libsrc/_DEVELOPMENT/*.[0-9]
     
