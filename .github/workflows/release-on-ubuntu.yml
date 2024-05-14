@@ -42,7 +42,7 @@ jobs:
         MAKE_CONCURRENCY=-j2 ./build.sh -pzx -pzxn
     - name: Generate tar-ball
       run: |
-        for file in `find ./bin/`; do
+        for file in `find ./bin/*`; do
           file $file | grep -i elf >> /dev/null
           if [ $? = 0 ]; then
             echo "Stripping $file"
@@ -50,7 +50,7 @@ jobs:
           fi
         done
         cd ..
-        tar cfz z88dk-ubuntu-22.04.tgz z88dk/bin z88dk/lib z88dk/include z88dk/libsrc/*.lib z88dk/libsrc/_DEVELOPMENT/*.[0-9]
+        tar cvfz z88dk-ubuntu-22.04.tgz z88dk/bin z88dk/lib z88dk/include z88dk/libsrc/*.lib z88dk/libsrc/_DEVELOPMENT/*.[0-9]
     
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
