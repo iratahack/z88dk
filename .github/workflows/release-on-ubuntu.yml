@@ -42,9 +42,11 @@ jobs:
         MAKE_CONCURRENCY=-j2 ./build.sh -pzx -pzxn
     - name: Generate tar-ball
       run: |
+        ls -al ./bin
         for f in `find ./bin/*`; do
+          echo "Checking $f"
           file $f | grep -i elf >> /dev/null
-          if [ $? = 0 ]; then
+          if [ $? -eq 0 ]; then
             echo "Stripping $f"
             strip $f
             echo "$f Stripped"
