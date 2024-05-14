@@ -41,11 +41,11 @@ jobs:
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         MAKE_CONCURRENCY=-j2 ./build.sh -pzx -pzxn
     - name: Generate tar-ball
-      continue-on-error: true
       run: |
         strip bin/*
         cd ..
         tar cvfz z88dk-ubuntu-22.04.tgz z88dk/bin z88dk/lib z88dk/include z88dk/libsrc/*.lib z88dk/libsrc/_DEVELOPMENT/*.[0-9]
+      continue-on-error: true
 
     - name: Create release
       uses: "marvinpinto/action-automatic-releases@latest"
@@ -54,4 +54,4 @@ jobs:
         automatic_release_tag: "latest"
         prerelease: true
         title: "Automated release from ${{ github.ref_name }}"
-        files: ../z88dk-ubuntu-22.04.tgz
+        files: ./z88dk-ubuntu-22.04.tgz
