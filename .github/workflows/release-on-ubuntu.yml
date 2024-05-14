@@ -41,15 +41,12 @@ jobs:
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
         MAKE_CONCURRENCY=-j2 ./build.sh -pzx -pzxn
     - name: Generate tar-ball
+      continue-on-error: true
       run: |
-        ls -al ./bin
         for f in `find ./bin/*`; do
-          echo "Checking $f"
           file $f | grep -i elf >> /dev/null
           if [ $? -eq 0 ]; then
-            echo "Stripping $f"
             strip $f
-            echo "$f Stripped"
           fi
         done
         cd ..
