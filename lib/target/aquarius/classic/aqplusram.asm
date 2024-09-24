@@ -15,7 +15,7 @@ ENDIF
 
 
 IFNDEF CLIB_FARHEAP_FIRST
-    defc CLIB_FARHEAP_FIRST = AQPLUS_FIRST_BANK
+    defc CLIB_FARHEAP_FIRST = 35
 ENDIF
 
 IF CLIB_FARHEAP_BANKS = -1
@@ -124,7 +124,7 @@ banked_call:
     ld      d,(hl)
     inc     hl
     ld      a,(hl)          ; ...and page
-    add     AQPLUS_FIRST_BANK - 1
+    add     AQPLUS_FIRST_BANK
     inc     hl
     inc     hl              ; Yes this should be here
     push    hl              ; Push the real return address
@@ -156,12 +156,12 @@ loadbanks:
     ; Save current binding
     in      a,(PORT_BANK3)
     push    af
-    ld      a,1
+    xor     a
 loadloop:
     push    af
-    add     AQPLUS_FIRST_BANK - 1  ;We use banks 1 - 29 for compatibility with other targets
+    add     AQPLUS_FIRST_BANK
     out     (PORT_BANK3),a
-    sub     AQPLUS_FIRST_BANK - 1
+    sub     AQPLUS_FIRST_BANK
     call    setext
     ld      hl,_basename
     ld      de, $C000
