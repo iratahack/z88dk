@@ -151,7 +151,7 @@ banked_call:
     EXTERN  __esp_read_bytes
     EXTERN  asm_strlen
     
-; Load banks 35 -> 63 (we call them 1 ->29 )
+; Load RAM pages 32 -> 63 (we call them bank 0 -> 31)
 loadbanks:
     ; Save current binding
     in      a,(PORT_BANK3)
@@ -168,7 +168,7 @@ loadloop:
     call    readFile
     pop     af
     inc     a
-    cp      29
+    cp      32
     jr      nz,loadloop
     pop     af
     out     (PORT_BANK3),a
