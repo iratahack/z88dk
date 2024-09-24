@@ -148,6 +148,7 @@ banked_call:
     EXTERN  __esp_send_byte
     EXTERN  __esp_send_bytes
     EXTERN  __esp_read_byte
+    EXTERN  __esp_read_bytes
     EXTERN  asm_strlen
     
 ; Load banks 35 -> 63 (we call them 1 ->29 )
@@ -162,11 +163,30 @@ loadloop:
     out     (PORT_BANK3),a
     sub     AQPLUS_FIRST_BANK - 1
     call    setext
+    ld      hl,_basename
+    ld      de, $C000
+    call    readFile
+    pop     af
+    inc     a
+    cp      29
+    jr      nz,loadloop
+    pop     af
+    out     (PORT_BANK3),a
+    ret
+
+    PUBLIC  readFile
+    ;
+    ; Read up to 16K from a file on the SD card
+    ;
+    ; Input:
+    ;   hl - Pointer to null terminated file name
+    ;   de - Destination address for file contents
+    ;
+readFile:
     ld      a,ESPCMD_OPEN
     call    __esp_send_cmd
     xor     a                   ;O_RDONLY
     call    __esp_send_byte
-    ld      hl,_basename
     push    hl
     call    asm_strlen
     ld      bc,hl
@@ -175,7 +195,7 @@ loadloop:
     call    __esp_send_bytes
     call    __esp_read_byte     ;Read fd
     bit     7,a
-    jr      nz,next
+    jr      nz, closeAll
     ld      b,a                 ;Keep fd safe
     ld      a,ESPCMD_READ
     call    __esp_send_cmd
@@ -190,34 +210,20 @@ loadloop:
     ; Read result
     call    __esp_read_byte
     and     a
-    jr      nz,next
+    jr      nz, closeAll
     ; Read offered length
     call    __esp_read_byte
     ld      c,a
     call    __esp_read_byte
     ld      b,a
     ; And read into our bank
-    ld      hl,$C000
-loop:
-    ld      a,b
-    or      c
-    jr      z,next
-    call    __esp_read_byte
-    ld      (hl),a
-    inc     hl
-    dec     bc
-    jr      loop
-next:
-    pop     af
-    inc     a
-    cp      29
-    jr      nz,loadloop
+    ex      de, hl
+    call    __esp_read_bytes
+closeAll:
     ; Close all files
     ld      a,ESPCMD_CLOSEALL
     call    __esp_send_cmd
     call    __esp_read_byte     ;Read the response
-    pop     af
-    out     (PORT_BANK3),a
     ret
 
 setext:
